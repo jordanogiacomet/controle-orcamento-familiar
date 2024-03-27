@@ -4,8 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./api/index.js"
+    "dev": "nodemon ./api/index.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watchAll",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watchAll --coverage",
+    "test:receita:service": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=api/test/services/receitaService.test.js"
   },
   "keywords": [],
   "author": "",
