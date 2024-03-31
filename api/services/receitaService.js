@@ -52,10 +52,35 @@ class ReceitaService {
       throw new Error(error.message);
     }
   }
-  async pegaTodasAsReceitas() {
+  async pegarTodasAsReceitas() {
     const receitas = await database.Receita.findAll();
 
     return receitas;
+  }
+  async pegarReceitaPeloId(id) {
+    const receita = await database.Receita.findOne({
+      where: {
+        id: id,
+      },
+    });
+    if (!receita) {
+      throw new Error('Receita informada não cadastrada!');
+    }
+    return receita;
+  }
+  async deletarReceitaPeloId(id) {
+    await this.pegarReceitaPeloId(id);
+
+    try {
+      await database.Receita.destroy({
+        where: {
+          id: id,
+        },
+      });
+      return {message: 'Receita excluida'};
+    } catch (error) {
+      throw new Error('Erro ao tentar deletar a receita');
+    }
   }
 }
 
