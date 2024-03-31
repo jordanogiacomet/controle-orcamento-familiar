@@ -3,7 +3,7 @@ const ReceitaService = require('../services/receitaService');
 const receitaService = new ReceitaService();
 
 class ReceitaController {
-  static async cadastrar(req, res) {
+  static async cadastrarReceita(req, res) {
     const {descricao, valor, data} = req.body;
 
     try {

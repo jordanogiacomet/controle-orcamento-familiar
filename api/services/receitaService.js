@@ -1,6 +1,8 @@
 /* eslint-disable max-len */
 const database = require('../db/models');
+const moment = require('moment');
 const uuid = require('uuid');
+const conversorDeData = require('../utils/dataUtils.js');
 
 
 class ReceitaService {
@@ -16,30 +18,34 @@ class ReceitaService {
         throw new Error('A data da receita e obrigatoria;');
       }
 
-      const dataReceita = new Date(dto.data);
-      const primeiroDiaMes = new Date(dataReceita.getFullYear(), dataReceita.getMonth(), 1);
-      const ultimoDiaMes = new Date(dataReceita.getFullYear(), dataReceita.getMonth() + 1, 0);
+      const dataReceita = moment(conversorDeData(dto.data));
+
+      const primeiroDiaMes = dataReceita.clone().startOf('month');
+      const ultimoDiaMes = dataReceita.clone().endOf('month');
 
       const receitaExistente = await database.Receita.findOne({
         where: {
           descricao: dto.descricao,
           data: {
-            [database.Sequelize.Op.gte]: primeiroDiaMes,
-            [database.Sequelize.Op.lte]: ultimoDiaMes,
+            [database.Sequelize.Op.gte]: primeiroDiaMes.toDate(),
+            [database.Sequelize.Op.lte]: ultimoDiaMes.toDate(),
           },
         },
       });
+
 
       if (receitaExistente) {
         throw new Error('Não é possível cadastrar duas receitas com a mesma descrição no mesmo mês;');
       }
 
+
       const novaReceita = await database.Receita.create({
         id: uuid.v4(),
         descricao: dto.descricao,
         valor: dto.valor,
-        data: dto.data,
+        data: dataReceita,
       });
+
 
       return novaReceita;
     } catch (error) {

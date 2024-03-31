@@ -1,6 +1,7 @@
-require('@jest/globals');
+/* eslint-disable max-len */
 const ReceitaService = require('../../services/receitaService.js');
 const receitaService = new ReceitaService();
+const {describe} = require('@jest/globals');
 
 describe('Testando receitaService', () => {
   it('A receita deve possuir descricao, valor e data;', async () => {
@@ -14,24 +15,16 @@ describe('Testando receitaService', () => {
         .rejects
         .toThrowError('A data da receita e obrigatoria;');
   });
-  it('Nao se pode cadastrar uma receita duplicada no mesmo mes;', async () => {
+  it('Não é possível cadastrar duas receitas com a mesma descrição no mesmo mês;', async () => {
     const receitaMock = {
       descricao: 'Salario',
       valor: 'R$ 200,00',
-      data: '2023-01-01',
+      data: '01-01-2023',
     };
-    receitaService.cadastrarReceita(receitaMock);
+    await receitaService.cadastrarReceita(receitaMock);
 
-    const receitaMockDuplicada = {
-      descricao: 'Salario',
-      valor: 'R$ 200,00',
-      data: '2023-01-01',
-    };
-    const receitaDuplicada = receitaService
-        .cadastrarReceita(receitaMockDuplicada);
-
-    await expect(receitaDuplicada)
-        .rejects
-        .toThrowError('Não é possível cadastrar duas receitas com a mesma descrição no mesmo mês;');
+    await expect(async () => {
+      await receitaService.cadastrarReceita(receitaMock);
+    }).rejects.toThrowError('Não é possível cadastrar duas receitas com a mesma descrição no mesmo mês;');
   });
 });
