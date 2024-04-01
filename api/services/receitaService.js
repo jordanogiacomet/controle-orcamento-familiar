@@ -58,15 +58,23 @@ class ReceitaService {
     return receitas;
   }
   async pegarReceitaPeloId(id) {
-    const receita = await database.Receita.findOne({
-      where: {
-        id: id,
-      },
-    });
-    if (!receita) {
-      throw new Error('Receita informada não cadastrada!');
+    if (typeof id === 'undefined') {
+      throw new Error('ID não pode ser undefined');
     }
-    return receita;
+
+    try {
+      const receita = await database.Receita.findOne({
+        where: {
+          id: id,
+        },
+      });
+      if (!receita) {
+        throw new Error('Receita informada não cadastrada!');
+      }
+      return receita;
+    } catch (error) {
+      throw new Error(error.message);
+    }
   }
   async deletarReceitaPeloId(id) {
     await this.pegarReceitaPeloId(id);
