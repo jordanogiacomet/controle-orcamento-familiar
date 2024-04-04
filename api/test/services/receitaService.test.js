@@ -1,7 +1,11 @@
 /* eslint-disable max-len */
 const ReceitaService = require('../../services/receitaService.js');
 const receitaService = new ReceitaService();
-const {describe} = require('@jest/globals');
+const {describe, expect} = require('@jest/globals');
+const database = require('../../db/models');
+const converterParaISO = require('../../utils/dataUtils.js');
+const moment = require('moment');
+
 
 describe('Testando receitaService', () => {
   it('A receita deve possuir descricao, valor e data;', async () => {
@@ -49,5 +53,20 @@ describe('Testando receitaService', () => {
         }),
     );
     await receitaService.deletarReceitaPeloId(receitaSalva.id);
+  });
+  it('Deve retornar todas as receitas.', async () => {
+    await database.Receita.bulkCreate([
+      {descricao: 'Mesada', valor: 'R$ 150,00', data: moment(converterParaISO('2023-01-07'))},
+      {descricao: 'Salário', valor: 'R$ 200,00', data: moment(converterParaISO('2023-01-07'))},
+    ]);
+
+    const receitas = await receitaService.pegarTodasAsReceitas();
+
+    expect(receitas.length).toBe(2);
+    expect(receitas[0].descricao).toBe('Mesada');
+    expect(receitas[1].descricao).toBe('Salário');
+
+    await receitaService.deletarReceitaPeloId(receitas[0].id);
+    await receitaService.deletarReceitaPeloId(receitas[1].id);
   });
 });
